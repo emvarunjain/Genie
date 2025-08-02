@@ -1,0 +1,24 @@
+# Git
+.git
+.gitignore
+
+# Node modules
+node_modules
+
+# Next.js build output (if not needed in final image directly, handled by multi-stage)
+.next
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Local environment variables
+.env*.local
+
+# Editor/IDE specific
+.vscode
+*.swp
+
+# OS specific
+.DS_Store
+Thumbs.db

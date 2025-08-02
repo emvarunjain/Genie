@@ -1,0 +1,54 @@
+{
+  "app": {
+    "name": "Genie",
+    "version": "1.0.0",
+    "description": "Your intelligent AI assistant powered by Genie"
+  },
+  "server": {
+    "hostname": "localhost",
+    "port": 3000,
+    "protocol": "http"
+  },
+  "api": {
+    "baseUrl": "http://localhost:8000",
+    "timeout": 30000,
+    "retries": 3
+  },
+  "database": {
+    "type": "memory",
+    "host": "localhost",
+    "port": 5432,
+    "name": "genie_studio"
+  },
+  "security": {
+    "jwtSecret": "your-secret-key-change-in-production",
+    "sessionTimeout": 86400000,
+    "rateLimit": {
+      "enabled": true,
+      "maxRequests": 100,
+      "windowMs": 900000
+    }
+  },
+  "features": {
+    "chat": {
+      "enabled": true,
+      "maxHistory": 100,
+      "streaming": true
+    },
+    "fileUpload": {
+      "enabled": true,
+      "maxSize": 10485760,
+      "allowedTypes": [".pdf", ".doc", ".docx", ".txt", ".csv", ".json"],
+      "storagePath": "./uploads"
+    },
+    "admin": {
+      "enabled": true,
+      "maxUsers": 1000
+    }
+  },
+  "ui": {
+    "theme": "auto",
+    "language": "en",
+    "timezone": "UTC"
+  }
+} 

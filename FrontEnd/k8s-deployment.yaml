@@ -1,0 +1,113 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: agno-studio
+  labels:
+    app: agno-studio
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: agno-studio
+  template:
+    metadata:
+      labels:
+        app: agno-studio
+    spec:
+      containers:
+      - name: agno-studio
+        image: agno-studio:latest
+        ports:
+        - containerPort: 3000
+        env:
+        - name: NODE_ENV
+          value: "production"
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: agno-secrets
+              key: jwt-secret
+        - name: NEXT_PUBLIC_API_BASE_URL
+          value: "http://api-service:8000"
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "250m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/health
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: uploads
+          mountPath: /app/uploads
+      volumes:
+      - name: uploads
+        persistentVolumeClaim:
+          claimName: agno-uploads-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agno-studio-service
+spec:
+  selector:
+    app: agno-studio
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000
+  type: ClusterIP
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: agno-uploads-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: agno-secrets
+type: Opaque
+data:
+  jwt-secret: eW91ci1zZWNyZXQta2V5LWNoYW5nZS1pbi1wcm9kdWN0aW9u
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: agno-studio-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - agno-studio.example.com
+    secretName: agno-studio-tls
+  rules:
+  - host: agno-studio.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: agno-studio-service
+            port:
+              number: 80 

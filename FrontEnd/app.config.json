@@ -1,0 +1,9 @@
+{
+  "appName": "Genie Assistant",
+  "apiEndpoint": "https://jsonplaceholder.typicode.com/posts",
+  "defaultBotMessage": "Hello! I am Genie, your intelligent assistant. How can I help you today?",
+  "features": {
+    "enableFileUpload": false,
+    "maxMessageLength": 500
+  }
+}
