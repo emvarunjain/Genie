@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - REDIS_HOST=redis
+    depends_on:
+      - redis
+    volumes:
+      - ./tmp:/app/tmp
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - agno-network
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - agno-network
+
+  # Optional: PostgreSQL for production
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: agno_db
+      POSTGRES_USER: agno_user
+      POSTGRES_PASSWORD: agno_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - agno-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  agno-network:
+    driver: bridge 
